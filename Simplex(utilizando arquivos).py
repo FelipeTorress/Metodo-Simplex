@@ -1,13 +1,6 @@
-def montarTableau(objetivo, restricao, quantLinhas):
-    tableau = []
+def encontrarCoeficientes(linha,listaDeCoeficientes):
     indexX = -1
-
-    listaDeCoeficientes = []
-
-    for linha in restricao:
-        listaDeCoeficientes = []
-    
-        for palavra in linha:
+    for palavra in linha:
 
             indexX = -1
             for letra in palavra:
@@ -15,7 +8,28 @@ def montarTableau(objetivo, restricao, quantLinhas):
                 if letra == 'X' or letra == 'x': 
                     listaDeCoeficientes.append(int(palavra[:indexX]))
                     break
-        tableau.append(listaDeCoeficientes)
+    listaDeCoeficientes.append(int(linha[len(linha)-1]))
+
+    return listaDeCoeficientes
+
+def coeficienteFuncaoObjetiva(vetor, lista):
+    
+
+
+def montarTableau(objetivo, restricao, quantLinhas):
+    tableau = []
+    listaDeCoeficientes = []
+
+    #colocando as restriçoes
+    for linha in restricao:
+        listaDeCoeficientes = [] 
+        tableau.append(encontrarCoeficientes(linha, listaDeCoeficientes))
+
+    #colocando função objetiva
+    listaDeCoeficientes = []
+    vetorAuxiliar = objetivo.split()
+    tableau.append(coeficienteFuncaoObjetiva(vetorAuxiliar[3:], listaDeCoeficientes))
+
     return tableau
 
    
