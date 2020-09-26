@@ -6,15 +6,34 @@ def encontrarCoeficientes(linha,listaDeCoeficientes):
             for letra in palavra:
                 indexX+=1
                 if letra == 'X' or letra == 'x': 
-                    listaDeCoeficientes.append(int(palavra[:indexX]))
+                    listaDeCoeficientes.append(float(palavra[:indexX]))
                     break
-    listaDeCoeficientes.append(int(linha[len(linha)-1]))
+    listaDeCoeficientes.append(float(linha[len(linha)-1]))
 
     return listaDeCoeficientes
 
-def coeficienteFuncaoObjetiva(vetor, lista):
-    
+def coeficienteFuncaoObjetiva(vetor, lista, quantDeVariaveis):
+    variaveisBasicas = 0
+    indexX = -1
+    indexPalavra = -1
 
+    for palavra in vetor:
+            indexPalavra+=1
+            indexX = -1
+            for letra in palavra:
+                indexX+=1
+                if letra == 'X' or letra == 'x':
+                    variaveisBasicas+=1
+                    if vetor[indexPalavra-1] == '-':
+                        lista.append(float(palavra[:indexX])* -1)
+                    else:
+                        lista.append(float(palavra[:indexX]))
+                    break
+    if quantDeVariaveis != variaveisBasicas:
+        for i in range(quantDeVariaveis - variaveisBasicas):
+            lista.append(float(0))
+
+    return lista
 
 def montarTableau(objetivo, restricao, quantLinhas):
     tableau = []
@@ -28,11 +47,9 @@ def montarTableau(objetivo, restricao, quantLinhas):
     #colocando função objetiva
     listaDeCoeficientes = []
     vetorAuxiliar = objetivo.split()
-    tableau.append(coeficienteFuncaoObjetiva(vetorAuxiliar[3:], listaDeCoeficientes))
+    tableau.append(coeficienteFuncaoObjetiva(vetorAuxiliar[3:], listaDeCoeficientes, len(tableau[0])))
 
     return tableau
-
-   
 
 def isMaximizar(objetivo):
     if "Max" in objetivo or "max" in objetivo:
@@ -57,7 +74,6 @@ def isMaximizar(objetivo):
 
         return newString
 
-
 def lerArquivo():
     restricao = []
     quantLinhas = 0
@@ -68,13 +84,87 @@ def lerArquivo():
             restricao.append(linha.split(' '))
     return objetivo, restricao, quantLinhas
 
+def econtrarVariaveis(basicas, naobasica, quantDeLinhas, quantDeVariaveis):
+    for i in range(quantDeVariaveis):
+        if i == 0:
+            continue
+        elif i < quantDeLinhas:
+            naobasica.append('x'+str(i))
+        else:
+            basicas.append('x'+str(i))
+    return basicas, naobasica
+
+def solucaoOtima(tableau):
+    for i in tableau[len(tableau)-1]:
+        if i > 0:
+            return False
+    return True
+
+def encontarVariavelParaEntrar(tableau,variaveisNaoBasicas):
+    maiornumero = 0
+    indice = -1
+    indiceParaSair = 0 
+
+    for i in tableau[len(tableau)-1]:
+        indice+=1
+        if i >= maiornumero or indice == 0:
+            maiornumero = i
+            indiceParaSair = indice
+    
+    return indiceParaSair
+        
+def encontrarVariavelParaSair(tableau, variaveisBasicas, indexVariavelParaEntrar):
+    menorValor = -1 
+    indexParaSair = -1
+
+    for i in range(len(tableau) - 1):
+        if tableau[i][indexVariavelParaEntrar] > 0:
+            valorAtual = tableau[i][len(tableau[i])-1] / tableau[i][indexVariavelParaEntrar]
+            if menorValor > valorAtual or i == 0:
+                indexParaSair = i
+                menorValor = valorAtual
+    return indexParaSair
+
+def trocarVariaveis(indexEntrar, indexSair, naoBasicas, basicas,tableau):
+    aux = naoBasicas[indexEntrar]
+    aux2 = basicas[indexSair]
+
+    print(naoBasicas)
+    print(basicas)
+
+    naoBasicas[indexEntrar] = aux2
+    basicas[indexSair] = aux
+
+    print(naoBasicas)
+    print(basicas)
+
+    pivoteamento(tableau,indexEntrar,indexSair)#   Pivotear[indexSair][indexEntrar]  
+    
+
+def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
+    
+    #while not solucaoOtima(tableau):
+        indexVariavelParaEntrar = encontarVariavelParaEntrar(tableau,variaveisNaoBasicas)
+        indexVariavelParaSair = encontrarVariavelParaSair(tableau,variaveisBasicas,indexVariavelParaEntrar)
+        print(indexVariavelParaEntrar)
+        print(indexVariavelParaSair)
+        trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
+
+def main():
+    objetivo, restricao, quantLinhas = lerArquivo()
+    #print(objetivo)
+    #print(restricao)
+    objetivo = isMaximizar(objetivo) # saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
+    #print(objetivo)
+    tableau = []
+    tableau = montarTableau(objetivo, restricao, quantLinhas)
+    #print(tableau)
+    variaveisBasicas = []
+    variaveisNaoBasicas = []
+    basicas, naobasicas = econtrarVariaveis(variaveisBasicas,variaveisNaoBasicas, quantLinhas,len(tableau[0]))
+    print(basicas)
+    print(naobasicas)
+    resolverTableau(tableau,variaveisBasicas,variaveisNaoBasicas)
 
 
-objetivo, restricao, quantLinhas = lerArquivo()
-print(objetivo)
-print(restricao)
-objetivo = isMaximizar(objetivo) # saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
-print(objetivo)
-tableau = []
-tableau = montarTableau(objetivo, restricao, quantLinhas)
-print(tableau)
+main()
