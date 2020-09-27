@@ -77,7 +77,7 @@ def isMaximizar(objetivo):
 def lerArquivo():
     restricao = []
     quantLinhas = 0
-    with open('dados.txt', 'r') as arquivo:
+    with open('dados1.txt', 'r') as arquivo:
         objetivo = arquivo.readline()
         for linha in arquivo.readlines():
             quantLinhas+=1
@@ -103,15 +103,16 @@ def solucaoOtima(tableau):
 def encontarVariavelParaEntrar(tableau,variaveisNaoBasicas):
     maiornumero = 0
     indice = -1
-    indiceParaSair = 0 
+    indiceParaEntrar = 0 
 
-    for i in tableau[len(tableau)-1]:
+    linha = tableau[len(tableau)-1]
+    for i in linha[:-1]:
         indice+=1
         if i >= maiornumero or indice == 0:
             maiornumero = i
-            indiceParaSair = indice
+            indiceParaEntrar = indice
     
-    return indiceParaSair
+    return indiceParaEntrar
         
 def encontrarVariavelParaSair(tableau, variaveisBasicas, indexVariavelParaEntrar):
     menorValor = -1 
@@ -120,51 +121,75 @@ def encontrarVariavelParaSair(tableau, variaveisBasicas, indexVariavelParaEntrar
     for i in range(len(tableau) - 1):
         if tableau[i][indexVariavelParaEntrar] > 0:
             valorAtual = tableau[i][len(tableau[i])-1] / tableau[i][indexVariavelParaEntrar]
-            if menorValor > valorAtual or i == 0:
+            if menorValor > valorAtual or menorValor == -1:
                 indexParaSair = i
                 menorValor = valorAtual
     return indexParaSair
+
+def pivoteamento(tableau, indexEntrar, indexSair):
+    linha = []
+    if tableau[indexSair][indexEntrar] != 1:
+        for i in tableau[indexSair]:
+            linha.append(i/tableau[indexSair][indexEntrar])
+        
+        tableau[indexSair] = linha
+
+    
+    for i in range(len(tableau)):
+        if i != indexSair and tableau[i][indexEntrar] > 0:
+            linha = []
+            count = 0
+            aux = tableau[i][indexEntrar] * -1
+            
+
+            for j in range( len(tableau[0]) ):
+                linha.append(tableau[indexSair][j] * aux + tableau[i][j])
+              
+            tableau[i] = linha    
+
+
+        elif i != indexSair and tableau[i][indexEntrar] < 0: 
+                pass
+
+            
+    return tableau
+
 
 def trocarVariaveis(indexEntrar, indexSair, naoBasicas, basicas,tableau):
     aux = naoBasicas[indexEntrar]
     aux2 = basicas[indexSair]
 
-    print(naoBasicas)
-    print(basicas)
-
     naoBasicas[indexEntrar] = aux2
     basicas[indexSair] = aux
-
-    print(naoBasicas)
-    print(basicas)
-
-    pivoteamento(tableau,indexEntrar,indexSair)#   Pivotear[indexSair][indexEntrar]  
     
-
+    return pivoteamento(tableau,indexEntrar,indexSair)#   Pivotear[indexSair][indexEntrar]  
+    
 def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
     
-    #while not solucaoOtima(tableau):
+    while not solucaoOtima(tableau):
         indexVariavelParaEntrar = encontarVariavelParaEntrar(tableau,variaveisNaoBasicas)
         indexVariavelParaSair = encontrarVariavelParaSair(tableau,variaveisBasicas,indexVariavelParaEntrar)
-        print(indexVariavelParaEntrar)
-        print(indexVariavelParaSair)
-        trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
+        print("entrar:"+ str(indexVariavelParaEntrar) +" sair:"+str(indexVariavelParaSair))
+        tableau = trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
+        print(tableau)
+
+    return tableau
 
 def main():
     objetivo, restricao, quantLinhas = lerArquivo()
-    #print(objetivo)
-    #print(restricao)
     objetivo = isMaximizar(objetivo) # saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
-    #print(objetivo)
     tableau = []
     tableau = montarTableau(objetivo, restricao, quantLinhas)
-    #print(tableau)
     variaveisBasicas = []
     variaveisNaoBasicas = []
     basicas, naobasicas = econtrarVariaveis(variaveisBasicas,variaveisNaoBasicas, quantLinhas,len(tableau[0]))
+    print(tableau)
     print(basicas)
     print(naobasicas)
-    resolverTableau(tableau,variaveisBasicas,variaveisNaoBasicas)
+    tableau = resolverTableau(tableau,variaveisBasicas,variaveisNaoBasicas)
+    print(tableau)
+    print(basicas)
+    print(naobasicas)
 
 
 main()
