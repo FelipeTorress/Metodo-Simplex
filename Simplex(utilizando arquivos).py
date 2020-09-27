@@ -77,7 +77,7 @@ def isMaximizar(objetivo):
 def lerArquivo():
     restricao = []
     quantLinhas = 0
-    with open('dados1.txt', 'r') as arquivo:
+    with open('dados.txt', 'r') as arquivo:
         objetivo = arquivo.readline()
         for linha in arquivo.readlines():
             quantLinhas+=1
@@ -138,7 +138,6 @@ def pivoteamento(tableau, indexEntrar, indexSair):
     for i in range(len(tableau)):
         if i != indexSair and tableau[i][indexEntrar] > 0:
             linha = []
-            count = 0
             aux = tableau[i][indexEntrar] * -1
             
 
@@ -154,7 +153,6 @@ def pivoteamento(tableau, indexEntrar, indexSair):
             
     return tableau
 
-
 def trocarVariaveis(indexEntrar, indexSair, naoBasicas, basicas,tableau):
     aux = naoBasicas[indexEntrar]
     aux2 = basicas[indexSair]
@@ -169,27 +167,38 @@ def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
     while not solucaoOtima(tableau):
         indexVariavelParaEntrar = encontarVariavelParaEntrar(tableau,variaveisNaoBasicas)
         indexVariavelParaSair = encontrarVariavelParaSair(tableau,variaveisBasicas,indexVariavelParaEntrar)
-        print("entrar:"+ str(indexVariavelParaEntrar) +" sair:"+str(indexVariavelParaSair))
         tableau = trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
-        print(tableau)
 
     return tableau
+    
+def resultados(tableau, vetorBasico, vetorNaoBasico):
+    print('Tableau Final:')
+
+    tableauFinal =[]
+
+    for linha in range(len(tableau)):
+        aux = []
+        for coluna in range(len(tableau[0])):
+            aux.append(round(tableau[linha][coluna], 1))
+        tableauFinal.append(aux)
+
+    for linha in range(len(tableau)):
+        print(tableauFinal[linha])
+
+    print('Variáveis Básicas: '+str(vetorBasico))
+    print('Variáveis Não Básicas: '+str(vetorNaoBasico))
+    print('Valor de Z = '+ str( tableauFinal[len(tableauFinal) - 1] [len(tableauFinal[0])-1 ] ) )
 
 def main():
-    objetivo, restricao, quantLinhas = lerArquivo()
-    objetivo = isMaximizar(objetivo) # saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
     tableau = []
-    tableau = montarTableau(objetivo, restricao, quantLinhas)
     variaveisBasicas = []
     variaveisNaoBasicas = []
-    basicas, naobasicas = econtrarVariaveis(variaveisBasicas,variaveisNaoBasicas, quantLinhas,len(tableau[0]))
-    print(tableau)
-    print(basicas)
-    print(naobasicas)
-    tableau = resolverTableau(tableau,variaveisBasicas,variaveisNaoBasicas)
-    print(tableau)
-    print(basicas)
-    print(naobasicas)
 
+    objetivo, restricao, quantLinhas = lerArquivo()
+    objetivo = isMaximizar(objetivo) # saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
+    tableau = montarTableau(objetivo, restricao, quantLinhas) 
+    basicas, naobasicas = econtrarVariaveis(variaveisBasicas,variaveisNaoBasicas, quantLinhas,len(tableau[0]))
+    tableau = resolverTableau(tableau,variaveisBasicas,variaveisNaoBasicas)
+    resultados(tableau, basicas, naobasicas)
 
 main()
