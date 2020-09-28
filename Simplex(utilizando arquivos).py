@@ -1,17 +1,18 @@
 def resultados(tableau, vetorBasico, vetorNaoBasico, objetivo, restricao):
+    print('\nProblema Inicial: ')
+    print(objetivo)
+    frase = ''
+    for i in range(len(restricao)):
+        frase=''
+        for j in restricao[i]:
+            frase = frase+' '+j
+        print(frase)
+    print('\n')
+    
     if tableau == None:
-        print('o Problema possui infinitas soluções')
+        print('\nNao foi possivel encontrar solucao Otima!')
+        print('O Problema possui infinitas solucoes')
     else:
-        print('Problema Inicial: ')
-        print(objetivo)
-        frase = ''
-        for i in range(len(restricao)):
-            frase=''
-            for j in restricao[i]:
-                frase = frase+' '+j
-            print(frase)
-        print('\n')
-
         tableauFinal =[]
         vetorSolucao = []
         for linha in range(len(tableau)):
@@ -121,7 +122,7 @@ def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
         indexVariavelParaSair = encontrarVariavelParaSair(tableau,variaveisBasicas,indexVariavelParaEntrar)
 
         if indexVariavelParaSair == -1: #sem solução
-            return None
+            return None , None, None
 
         tableau,variaveisBasicas,variaveisNaoBasicas = trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
 
@@ -239,22 +240,22 @@ def isMaximizar(objetivo):
 
         return newString
 
-def lerArquivo():
+def lerArquivo(arquivo):
     restricao = []
     quantLinhas = 0
-    with open('dados1.txt', 'r') as arquivo:
+    with open(arquivo, 'r') as arquivo:
         objetivo = arquivo.readline()
         for linha in arquivo.readlines():
             quantLinhas+=1
             restricao.append(linha.split(' '))
     return objetivo, restricao, quantLinhas
 
-def main():
+def main(arquivo):
     tableau = []
     basicas = []
     naobasicas = []
 
-    funccObjetivo, restricao, quantLinhas = lerArquivo()#pegar dados do arquivo
+    funccObjetivo, restricao, quantLinhas = lerArquivo(arquivo)#pegar dados do arquivo
     objetivo = funccObjetivo #backup da funcao objetiva original
     objetivo = isMaximizar(objetivo) #saber se é de maximizar ou minimizar(multiplicando por -1 se for minimizar)
     tableau = montarTableau(objetivo, restricao, quantLinhas)#montar o tablau inicial
@@ -262,4 +263,11 @@ def main():
     tableau, basicas,naobasicas = resolverTableau(tableau,basicas,naobasicas)#encontrar resposta do simplex
     resultados(tableau, basicas, naobasicas, funccObjetivo, restricao)#imprimir respostas
 
-main()
+
+while True :
+    print('\n\nEntre com um arquivo(como especificado no readme): ')
+    arquivo = input()
+    if arquivo == '':
+        continue
+    else:
+        main(arquivo)
