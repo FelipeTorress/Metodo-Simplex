@@ -12,6 +12,8 @@ def resultados(tableau, vetorBasico, vetorNaoBasico, objetivo, restricao):
     if tableau == None:
         print('\nNao foi possivel encontrar solucao Otima!')
         print('O Problema possui infinitas solucoes')
+    elif tableau[len(tableau)-1] [ len(tableau[0]) -1 ] == 0:
+        print('\nO Problema nao possui solucao viavel')
     else:
         tableauFinal =[]
         vetorSolucao = []
@@ -128,7 +130,7 @@ def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
 
     return tableau, variaveisBasicas,variaveisNaoBasicas
 
-def coeficienteFuncaoObjetiva(vetor, lista, quantDeVariaveis):
+def coeficienteFuncaoObjetivo(vetor, lista, quantDeVariaveis):
     variaveisBasicas = 0
     indexX = -1
     indexPalavra = -1
@@ -213,7 +215,7 @@ def montarTableau(objetivo, restricao, quantLinhas):
     #colocando função objetiva
     listaDeCoeficientes = []
     vetorAuxiliar = objetivo.split()
-    tableau.append(coeficienteFuncaoObjetiva(vetorAuxiliar[3:], listaDeCoeficientes, len(tableau[0])))
+    tableau.append(coeficienteFuncaoObjetivo(vetorAuxiliar[3:], listaDeCoeficientes, len(tableau[0])))
 
     return tableau
 
@@ -262,7 +264,6 @@ def main(arquivo):
     basicas, naobasicas = acharBaseInicial(tableau)#encontrar variaveis basicas iniciais
     tableau, basicas,naobasicas = resolverTableau(tableau,basicas,naobasicas)#encontrar resposta do simplex
     resultados(tableau, basicas, naobasicas, funccObjetivo, restricao)#imprimir respostas
-
 
 while True :
     print('\n\nEntre com um arquivo(como especificado no readme): ')
