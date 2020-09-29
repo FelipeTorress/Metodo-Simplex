@@ -33,13 +33,17 @@ def resultados(tableau, vetorBasico, vetorNaoBasico, objetivo, restricao):
 
         print('\nVariaveis Basicas: '+str(vetorBasico)+" = "+str(vetorSolucao[:-1]))
         print('Variaveis Nao Basicas: '+str(vetorNaoBasico)+ ' = '+' [ 0 ] ')
-        print('Valor de Z = '+ str( tableauFinal[len(tableauFinal) - 1] [len(tableauFinal[0])-1 ] ) )
+        print('Valor de Z = '+ str(tableauFinal[len(tableauFinal) - 1] [len(tableauFinal[0])-1 ] ) )
 
 def pivoteamento(tableau, indexEntrar, indexSair):
     linha = []
-    if tableau[indexSair][indexEntrar] != 1:
+    if tableau[indexSair][indexEntrar] != 1 and tableau[indexSair][indexEntrar] > 0:
         for i in tableau[indexSair]:
             linha.append(i/tableau[indexSair][indexEntrar])   
+        tableau[indexSair] = linha
+    elif tableau[indexSair][indexEntrar] != 1 and tableau[indexSair][indexEntrar] < 0:
+        for i in tableau[indexSair]:
+            linha.append(  (i/tableau[indexSair][indexEntrar]) * -1)   
         tableau[indexSair] = linha
 
     for i in range(len(tableau)):
@@ -127,7 +131,7 @@ def resolverTableau(tableau, variaveisBasicas, variaveisNaoBasicas):
             return None , None, None
 
         tableau,variaveisBasicas,variaveisNaoBasicas = trocarVariaveis(indexVariavelParaEntrar,indexVariavelParaSair, variaveisNaoBasicas, variaveisBasicas, tableau)
-
+        print(tableau)
     return tableau, variaveisBasicas,variaveisNaoBasicas
 
 def coeficienteFuncaoObjetivo(vetor, lista, quantDeVariaveis):
@@ -263,6 +267,17 @@ def main(arquivo):
     tableau = montarTableau(objetivo, restricao, quantLinhas)#montar o tablau inicial
     basicas, naobasicas = acharBaseInicial(tableau)#encontrar variaveis basicas iniciais
     tableau, basicas,naobasicas = resolverTableau(tableau,basicas,naobasicas)#encontrar resposta do simplex
+    
+    #invertendo se MAX
+    if objetivo == funccObjetivo:
+        aux = []
+        for i in range(len(tableau[0])):
+            if tableau[ len(tableau)-1 ][i] != 0:
+                aux.append(tableau[ len(tableau)-1 ][i] * -1)
+            else:
+                aux.append(float(0))
+        tableau[ len(tableau)-1 ] = aux     
+         
     resultados(tableau, basicas, naobasicas, funccObjetivo, restricao)#imprimir respostas
 
 while True :
